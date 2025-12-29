@@ -280,24 +280,41 @@ class CHIPCTCClassifier:
         ))
 
         # 绘制混淆矩阵
-        plt.figure(figsize=(10, 8))
-        cm = confusion_matrix(all_labels_names, all_preds_names, labels=sorted(self.label2id.keys()))
-        plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
-        plt.title("CHIP-CTC多分类混淆矩阵（验证集）")
-        plt.colorbar()
+        # 绘制混淆矩阵 (归一化)
+        plt.figure(figsize=(12, 10))  # 稍微增大图像尺寸以适应更多类别
+        # 计算归一化后的混淆矩阵 (按行归一化)
+        cm = confusion_matrix(
+            all_labels_names,
+            all_preds_names,
+            labels=sorted(self.label2id.keys()),
+            normalize='true'  # 关键修改：添加归一化参数
+        )
+        im = plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
+        plt.title("CHIP-CTC多分类混淆矩阵（验证集，按行归一化）")
+        plt.colorbar(im, fraction=0.046, pad=0.04)
         plt.xlabel("预测标签")
         plt.ylabel("真实标签")
-        tick_marks = np.arange(len(self.label2id))
-        plt.xticks(tick_marks, sorted(self.label2id.keys()), rotation=45)
-        plt.yticks(tick_marks, sorted(self.label2id.keys()))
 
+        # 设置坐标轴刻度和标签
+        tick_marks = np.arange(len(self.label2id))
+        class_names = sorted(self.label2id.keys())
+        plt.xticks(tick_marks, class_names, rotation=45, ha="right")
+        plt.yticks(tick_marks, class_names)
+
+        # 在每个格子中显示数值 (保留两位小数)
         thresh = cm.max() / 2.
         for i in range(cm.shape[0]):
             for j in range(cm.shape[1]):
-                plt.text(j, i, cm[i, j], ha="center", va="center",
-                         color="white" if cm[i, j] > thresh else "black")
+                plt.text(
+                    j, i,
+                    format(cm[i, j], '.2f'),  # 关键修改：格式化为浮点数
+                    ha="center",
+                    va="center",
+                    color="white" if cm[i, j] > thresh else "black",
+                    fontsize=6  # 对于类别较多的情况，减小字体
+                )
         plt.tight_layout()
-        plt.savefig("./chip_ctc_confusion_matrix.png")
+        plt.savefig("./chip_ctc_confusion_matrix_normalized.png", dpi=300, bbox_inches='tight')
         plt.show()
 
         accuracy = sum([1 for p, l in zip(all_preds, all_labels) if p == l]) / len(all_labels)

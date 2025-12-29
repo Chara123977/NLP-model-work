@@ -4,3 +4,4 @@
 /.git/
 *.json
 /datasets/
+/.files/
