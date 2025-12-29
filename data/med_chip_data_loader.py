@@ -3,7 +3,7 @@ import json
 from paddlenlp.transformers import ErnieTokenizer
 from paddlenlp.data import Pad, Stack, Tuple
 from data.med_chip_datasets import CHIPCTCDataset
-from paddle.io import DataLoader
+from paddle.io import Dataset, DataLoader
 
 
 class CHIPCTCDataLoader:

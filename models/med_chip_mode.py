@@ -21,35 +21,26 @@ class CHIPCTCModel:
         self.lr_scheduler = None
         self.num_classes = None
 
-    def build(self, num_classes, load_from_path=None):
+    def build(self, num_classes):
         """
         构建完整的模型、优化器、损失函数和学习率调度器
         Args:
             num_classes: 分类任务的类别数量
-            load_from_path: 从指定路径加载已保存的模型（可选），如果为None则创建新模型
         Returns:
             tuple: (model, optimizer, loss_fn, lr_scheduler)
         """
         self.num_classes = num_classes
 
-        # 1. 构建或加载ERNIE序列分类模型
+        # 1. 构建ERNIE序列分类模型
         print(f"\n📌 开始构建模型：{self.config.model_name}")
         print(f"📌 分类类别数：{num_classes}")
-        if load_from_path:
-            print(f"📌 从路径加载已保存模型：{load_from_path}")
-            self.model = ErnieForSequenceClassification.from_pretrained(
-                load_from_path,
-                num_classes=num_classes,
-                attention_probs_dropout_prob=0.1,  # 注意力层dropout
-                hidden_dropout_prob=0.1  # 隐藏层dropout
-            )
-        else:
-            self.model = ErnieForSequenceClassification.from_pretrained(
-                self.config.model_name,
-                num_classes=num_classes,
-                attention_probs_dropout_prob=0.1,  # 注意力层dropout
-                hidden_dropout_prob=0.1  # 隐藏层dropout
-            )
+
+        self.model = ErnieForSequenceClassification.from_pretrained(
+            self.config.model_name,
+            num_classes=num_classes,
+            attention_probs_dropout_prob=0.1,  # 注意力层dropout
+            hidden_dropout_prob=0.1  # 隐藏层dropout
+        )
 
         # 2. 构建学习率调度器（StepDecay）
         self.lr_scheduler = paddle.optimizer.lr.StepDecay(

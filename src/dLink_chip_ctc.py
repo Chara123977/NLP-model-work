@@ -16,6 +16,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # 导入自定义模块（请确保路径正确）
 from config.chip_config import Config
 from models.med_chip_mode import CHIPCTCModel
+from data.med_chip_datasets import CHIPCTCDataset
 from data.med_chip_data_loader import CHIPCTCDataLoader
 
 
@@ -38,12 +39,8 @@ class CHIPCTCClassifier:
         plt.rcParams["axes.unicode_minus"] = False
         plt.rcParams["font.sans-serif"] = ["SimHei", "Microsoft YaHei"]
 
-    def train(self, load_from_path=None):
-        """
-        对外暴露的训练方法：启动完整的模型训练流程
-        Args:
-            load_from_path: 从指定路径加载已保存的模型继续训练（可选）
-        """
+    def train(self):
+        """对外暴露的训练方法：启动完整的模型训练流程"""
         # 创建保存目录
         os.makedirs(self.config.save_dir, exist_ok=True)
 
@@ -51,16 +48,14 @@ class CHIPCTCClassifier:
             # 1. 加载数据
             data_loader_instance = CHIPCTCDataLoader(self.config)
             train_loader, dev_loader, test_loader = data_loader_instance.build_dataloaders()
-            self.tokenizer, self.label2id, self.test_dataset = data_loader_instance.get_additional_info()
+            self.tokenizer, self.label2id, test_dataset = data_loader_instance.get_additional_info()
             self.id2label = {v: k for k, v in self.label2id.items()}
 
             # 2. 构建模型
             num_classes = len(self.label2id)
-            model_components = CHIPCTCModel(self.config, num_classes).build(num_classes, load_from_path)
+            model_components = CHIPCTCModel(self.config, num_classes).build(num_classes)
             self.model, optimizer, loss_fn, lr_scheduler = model_components
             print(f"\n✅ 成功加载模型：{self.config.model_name}（分类数：{num_classes}）")
-            if load_from_path:
-                print(f"✅ 从路径继续训练：{load_from_path}")
 
         except Exception as e:
             print(f"\n❌ 数据/模型加载失败：{e}")
@@ -122,7 +117,7 @@ class CHIPCTCClassifier:
 
         # 5. 生成测试集预测
         print("\n========== 生成测试集预测结果 ==========")
-        self._predict_test_set(best_model, test_loader, self.test_dataset)
+        self._predict_test_set(best_model, test_loader, test_dataset)
 
         # 6. 绘制训练曲线
         self._plot_training_curves(train_losses, dev_losses, dev_macro_f1s)
@@ -383,10 +378,7 @@ if __name__ == "__main__":
     # 2. 启动训练（调用对外的train方法）
     # classifier.train()
 
-    # 3. 从已保存模型继续训练（示例）
-    # classifier.train(load_from_path="runs/best_model")
-
-    # 4. 预测示例（训练完成后调用）
+    # 3. 预测示例（训练完成后调用）
     # 单文本预测
     text = "4）既往患有骨髓增生异常综合征（Myelodysplastic syndrome，MDS）的患者，或者未定型的急性白血病患者。"#"患者出现发热、咳嗽、胸闷等症状，持续3天"
     pred_label = classifier.predict(text)

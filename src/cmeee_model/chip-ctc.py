@@ -5,12 +5,13 @@ import numpy as np
 import paddle
 import matplotlib.pyplot as plt
 from tqdm import tqdm  # 导入tqdm进度条库
-from paddlenlp.transformers import ErnieForSequenceClassification
+from paddlenlp.transformers import ErnieForSequenceClassification, ErnieTokenizer
 from sklearn.metrics import classification_report, confusion_matrix, f1_score
 # 注意：如果你的 config.params 和 data.med_datasets 模块路径不同，请自行调整
 from config.chip_config import Config
-from models import CHIPCTCModel
-from models import CHIPCTCDataLoader
+from models.med_chip_mode import CHIPCTCModel
+from data.med_chip_datasets import CHIPCTCDataset
+from data.med_chip_data_loader import CHIPCTCDataLoader
 
 import warnings
 
