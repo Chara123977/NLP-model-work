@@ -1,0 +1,41 @@
+# ===================== CMeEE-V2 NER 模型配置文件 =====================
+
+# --------------------- 路径配置 ---------------------
+data_dir: "datasets/CMeEE-V2" # CMeEE-V2 数据集根目录
+save_dir: "cmeee_model"       # 模型和日志保存目录
+
+# --------------------- 模型配置 ---------------------
+model_name: "ernie-3.0-medium-zh" # 预训练模型名称
+num_classes: 17               # NER 标签总数 (O + 8种实体 * 2(B/I))
+
+# --------------------- 训练参数 ---------------------
+batch_size: 16               # 批次大小
+epochs: 2                     # 训练总轮数
+learning_rate: !!float 1e-5           # AdamW 优化器学习率
+max_seq_len: 128              # 输入序列最大长度
+
+# --------------------- 设备配置 ---------------------
+device: "gpu"                # 设备选择 ("cpu", "gpu", 或 "auto")
+
+# --------------------- 标签映射 (LABEL2ID) ---------------------
+LABEL_LIST:
+  - "O"
+  - "B-dis"
+  - "I-dis"
+  - "B-sym"
+  - "I-sym"
+  - "B-pro"
+  - "I-pro"
+  - "B-drug"
+  - "I-drug"
+  - "B-body"
+  - "I-body"
+  - "B-exam"
+  - "I-exam"
+  - "B-val"
+  - "I-val"
+  - "B-per"
+  - "I-per"
+
+# 注意: 在实际代码中，LABEL2ID 和 ID2LABEL 是由 label_list 自动生成的字典。
+# 此处仅列出 label_list 以供参考，YAML 文件本身不直接支持字典映射。
