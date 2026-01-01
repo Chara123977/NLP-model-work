@@ -3,7 +3,4 @@
 /.idea/
 /.git/
 *.json
-/datasets/
-/.files/
-/cmeee_model/
 /output/
